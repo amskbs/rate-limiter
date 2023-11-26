@@ -5,38 +5,36 @@ import (
 	"time"
 )
 
-func NewTokenBucketLimiter(rps int) Limiter {
-	l := TokenBucketLimiter{
+func NewLeakingBucketLimiter(rps int) Limiter {
+	l := LeakingBucketLimiter{
 		rps:    rps,
 		tokens: rps,
 	}
-	l.scheduleResetting()
+	go refillEverySecond(&l)
 	return &l
 }
 
-func (t *TokenBucketLimiter) scheduleResetting() {
+func refillEverySecond(l *LeakingBucketLimiter) {
 	ticker := time.NewTicker(time.Second)
 
-	go func() {
-		for {
-			select {
-			case <-ticker.C:
-				t.resetTokens()
-			}
+	for {
+		select {
+		case <-ticker.C:
+			l.refillTokens()
 		}
-	}()
+	}
 }
 
-type TokenBucketLimiter struct {
+type LeakingBucketLimiter struct {
 	rps    int
 	tokens int
 }
 
-func (t *TokenBucketLimiter) resetTokens() {
+func (t *LeakingBucketLimiter) refillTokens() {
 	t.tokens = t.rps
 }
 
-func (t *TokenBucketLimiter) TryEnqueue(_ Task) EnqueueResult {
+func (t *LeakingBucketLimiter) TryEnqueue(_ Task) EnqueueResult {
 	if t.tokens == 0 {
 		//fmt.Println("task has NOT been enqueued")
 		return EnqueueResult{
