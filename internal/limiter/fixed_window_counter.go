@@ -35,7 +35,7 @@ func (t *FixedWindowCounterLimiter) resetInterval() {
 	t.counter.Store(0)
 }
 
-func (t *FixedWindowCounterLimiter) Allow(_ Task) bool {
+func (t *FixedWindowCounterLimiter) Allow() bool {
 	if t.counter.Load() >= t.rps {
 		//fmt.Println("task has NOT been enqueued")
 		return false

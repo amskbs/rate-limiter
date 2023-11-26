@@ -1,47 +1,40 @@
 package limiter
 
 import (
-	"sync/atomic"
+	"container/list"
 	"time"
 )
 
 func NewSlidingWindowLogLimiter(rps int) Limiter {
-	l := SlidingWindowLogLimiter{
+	return &SlidingWindowLogLimiter{
 		rps: int32(rps),
+		log: list.New(),
 	}
-	l.scheduleResetting()
-	return &l
-}
-
-func (t *SlidingWindowLogLimiter) scheduleResetting() {
-	ticker := time.NewTicker(time.Second)
-
-	go func() {
-		for {
-			select {
-			case <-ticker.C:
-				t.resetInterval()
-			}
-		}
-	}()
 }
 
 type SlidingWindowLogLimiter struct {
-	rps     int32
-	counter atomic.Int32
+	rps int32
+	log *list.List
 }
 
-func (t *SlidingWindowLogLimiter) resetInterval() {
-	t.counter.Store(0)
-}
+func (t *SlidingWindowLogLimiter) Allow() bool {
+	for {
+		e := t.log.Back()
+		if e == nil {
+			break
+		}
+		if e.Value.(int64) < time.Now().UnixNano()-int64(time.Second) {
+			t.log.Remove(e)
+		} else {
+			break
+		}
+	}
 
-func (t *SlidingWindowLogLimiter) Allow(_ Task) bool {
-	if t.counter.Load() >= t.rps {
-		//fmt.Println("task has NOT been enqueued")
+	if t.log.Len() >= int(t.rps) {
 		return false
 	}
 
-	t.counter.Add(1)
+	t.log.PushFront(time.Now().UnixNano())
 
 	return true
 }

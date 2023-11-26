@@ -1,7 +1,7 @@
 package limiter
 
 type Limiter interface {
-	Allow(task Task) bool
+	Allow() bool
 }
 
 type Task struct {

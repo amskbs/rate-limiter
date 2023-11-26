@@ -7,19 +7,20 @@ import (
 )
 
 func main() {
-	calculator.Start()
-
 	//lim := limiter.NewTokenBucketLimiter(10)
-	lim := limiter.NewFixedWindowCounterLimiter(100)
+	//lim := limiter.NewFixedWindowCounterLimiter(100)
+	lim := limiter.NewSlidingWindowLogLimiter(100)
 
-	c := generate.New(0, 30)
+	allowedRPSCalculator := calculator.New("ALLOWED")
+	generatedRPSCalculator := calculator.New("GENERATED")
+	c := generate.New(0, 20)
 	for {
 		select {
 		case <-c:
-			allowed := lim.Allow(limiter.Task{})
-			if allowed {
-				calculator.Event()
+			if lim.Allow() {
+				allowedRPSCalculator.Event()
 			}
+			generatedRPSCalculator.Event()
 		}
 	}
 }

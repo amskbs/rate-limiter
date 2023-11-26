@@ -35,7 +35,7 @@ func (t *TokenBucketLimiter) resetTokens() {
 	t.tokens = t.rps
 }
 
-func (t *TokenBucketLimiter) Allow(_ Task) bool {
+func (t *TokenBucketLimiter) Allow() bool {
 	if t.tokens == 0 {
 		//fmt.Println("task has NOT been enqueued")
 		return false

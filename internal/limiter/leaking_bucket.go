@@ -33,7 +33,7 @@ func (t *LeakingBucketLimiter) refillTokens() {
 	t.tokens = t.rps
 }
 
-func (t *LeakingBucketLimiter) Allow(_ Task) bool {
+func (t *LeakingBucketLimiter) Allow() bool {
 	if t.tokens == 0 {
 		//fmt.Println("task has NOT been enqueued")
 		return false
