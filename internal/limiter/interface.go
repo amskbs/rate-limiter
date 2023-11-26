@@ -1,11 +1,7 @@
 package limiter
 
 type Limiter interface {
-	TryEnqueue(task Task) EnqueueResult
-}
-
-type EnqueueResult struct {
-	Enqueued bool
+	Allow(task Task) bool
 }
 
 type Task struct {

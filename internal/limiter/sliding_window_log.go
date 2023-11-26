@@ -5,15 +5,15 @@ import (
 	"time"
 )
 
-func NewFixedWindowCounterLimiter(rps int) Limiter {
-	l := FixedWindowCounterLimiter{
+func NewSlidingWindowLogLimiter(rps int) Limiter {
+	l := SlidingWindowLogLimiter{
 		rps: int32(rps),
 	}
 	l.scheduleResetting()
 	return &l
 }
 
-func (t *FixedWindowCounterLimiter) scheduleResetting() {
+func (t *SlidingWindowLogLimiter) scheduleResetting() {
 	ticker := time.NewTicker(time.Second)
 
 	go func() {
@@ -26,16 +26,16 @@ func (t *FixedWindowCounterLimiter) scheduleResetting() {
 	}()
 }
 
-type FixedWindowCounterLimiter struct {
+type SlidingWindowLogLimiter struct {
 	rps     int32
 	counter atomic.Int32
 }
 
-func (t *FixedWindowCounterLimiter) resetInterval() {
+func (t *SlidingWindowLogLimiter) resetInterval() {
 	t.counter.Store(0)
 }
 
-func (t *FixedWindowCounterLimiter) Allow(_ Task) bool {
+func (t *SlidingWindowLogLimiter) Allow(_ Task) bool {
 	if t.counter.Load() >= t.rps {
 		//fmt.Println("task has NOT been enqueued")
 		return false

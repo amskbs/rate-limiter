@@ -35,17 +35,13 @@ func (t *TokenBucketLimiter) resetTokens() {
 	t.tokens = t.rps
 }
 
-func (t *TokenBucketLimiter) TryEnqueue(_ Task) EnqueueResult {
+func (t *TokenBucketLimiter) Allow(_ Task) bool {
 	if t.tokens == 0 {
 		//fmt.Println("task has NOT been enqueued")
-		return EnqueueResult{
-			Enqueued: false,
-		}
+		return false
 	}
 
 	t.tokens--
 
-	return EnqueueResult{
-		Enqueued: true,
-	}
+	return true
 }

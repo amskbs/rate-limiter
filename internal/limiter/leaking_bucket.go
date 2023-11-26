@@ -33,17 +33,13 @@ func (t *LeakingBucketLimiter) refillTokens() {
 	t.tokens = t.rps
 }
 
-func (t *LeakingBucketLimiter) TryEnqueue(_ Task) EnqueueResult {
+func (t *LeakingBucketLimiter) Allow(_ Task) bool {
 	if t.tokens == 0 {
 		//fmt.Println("task has NOT been enqueued")
-		return EnqueueResult{
-			Enqueued: false,
-		}
+		return false
 	}
 
 	t.tokens--
 
-	return EnqueueResult{
-		Enqueued: true,
-	}
+	return true
 }
