@@ -1,7 +1,6 @@
 package limiter
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -43,7 +42,6 @@ func (t *LeakingBucketLimiter) TryEnqueue(_ Task) EnqueueResult {
 	}
 
 	t.tokens--
-	fmt.Printf("task enqueue time is %s\n", time.Now())
 
 	return EnqueueResult{
 		Enqueued: true,

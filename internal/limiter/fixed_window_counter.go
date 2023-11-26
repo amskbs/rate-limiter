@@ -1,7 +1,6 @@
 package limiter
 
 import (
-	"fmt"
 	"sync/atomic"
 	"time"
 )
@@ -45,7 +44,6 @@ func (t *FixedWindowCounterLimiter) TryEnqueue(_ Task) EnqueueResult {
 	}
 
 	t.counter.Add(1)
-	fmt.Printf("task enqueue time is %s\n", time.Now())
 
 	return EnqueueResult{
 		Enqueued: true,

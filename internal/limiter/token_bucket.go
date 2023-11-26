@@ -1,7 +1,6 @@
 package limiter
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -45,7 +44,6 @@ func (t *TokenBucketLimiter) TryEnqueue(_ Task) EnqueueResult {
 	}
 
 	t.tokens--
-	fmt.Printf("task enqueue time is %s\n", time.Now())
 
 	return EnqueueResult{
 		Enqueued: true,
